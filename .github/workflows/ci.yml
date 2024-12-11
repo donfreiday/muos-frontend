@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: donfreiday/muos-development:latest
+      options: --platform linux/amd64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build project
+        run: |
+          make
+          mkdir -p /build/opt/muos/extra
+          cp -r bin/* /build/opt/muos/extra
+
+      - name: Upload artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: /build
